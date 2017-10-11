@@ -13,15 +13,15 @@ require 'database.php';
 	<input type="text" name="username" id="username">
 	<label for="password">password</label>
 	<input type="password" name="password" id="password">
-	<input type="submit" name="signin">
-	<input type="submit" name="signup">
+	<input type="submit" name="signin" value="Sign in">
+	<input type="submit" name="signup" value="Sign up">
 </form>
 
 <?php
 if(isset($_POST['signin'])){
 	$username = $_POST['username'];
 	$temp_pwd = $_POST['password'];
-    if (!preg_match("/^(\w)+$/", $username) || !preg_match("/^(\w)+$/", $password)) {
+    if (!preg_match("/^(\w)+$/", $username) || !preg_match("/^(\w)+$/", $temp_pwd)) {
         die("Invalid username or password");
     }
     $stmt = $mysqli->prepare("select hashed_password from users where username=?");
@@ -33,7 +33,7 @@ if(isset($_POST['signin'])){
     $stmt->execute();
     $stmt->bind_result($password);
     $stmt->fetch();
-    if (password_verify($password, $temp_password)) {
+    if (password_verify($password, $temp_pwd)) {
         $_SESSION['user']   = $username;
         $_SESSION['token']  = bin2hex(openssl_random_pseudo_bytes(32));
     } else {
@@ -47,7 +47,7 @@ if(isset($_POST['signin'])){
 if(isset($_POST['signup'])){
 	$username = $_POST['username'];
 	$temp_pwd = $_POST['password'];
-    if (!preg_match("/^(\w)+$/", $username) || !preg_match("/^(\w)+$/", $password)) {
+    if (!preg_match("/^(\w)+$/", $username) || !preg_match("/^(\w)+$/", $temp_pwd)) {
         die("Invalid username or password");
     }
     $stmt = $mysqli->prepare("insert into users (username, hashed_password) values (?, ?)");
@@ -55,7 +55,7 @@ if(isset($_POST['signup'])){
         printf("Query Prep Failed: %s\n", $mysqli->error);
         exit;
     }
-    $stmt->bind_param("ss", $username, password_hash($password, PASSWORD_BCRYPT));
+    $stmt->bind_param("ss", $username, password_hash($temp_pwd, PASSWORD_BCRYPT));
     $stmt->execute();
     $stmt->close();
     header("Location: new-pet.html");
