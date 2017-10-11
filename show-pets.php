@@ -36,6 +36,5 @@ require 'database.php';
 	<p><?php echo $species?></p>
 	<p><?php echo $description ?></p>
 </div>
-</form>
 </body>
 </html>
